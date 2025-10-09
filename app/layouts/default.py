@@ -62,7 +62,7 @@ Where the fear has gone there will be nothing. Only I will remain.
 def compose(self) -> ComposeResult:
     with Horizontal():
         with Vertical(id="sidebar", classes="column_1"):
-            yield KmDirectoryTree("./")
+            yield KmDirectoryTree("./", id="directory_tree")
         with Vertical():
             with VerticalScroll():
                 markdown = Markdown(EXAMPLE_MARKDOWN)

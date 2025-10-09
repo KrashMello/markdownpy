@@ -4,13 +4,24 @@ from textual.containers import Horizontal, Vertical
 import os
 
 class KmInput(Input):
-    def on_input_submitted(self, event) -> None:
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, kwargs.get('placeholder'))
+        self.path = kwargs.get('path')
+
+    async def on_input_submitted(self, event) -> None:
+        tree = self.app.query_one('#directory_tree', KmDirectoryTree)
+        filename = event.value
         container = self.app.query_one('#input_container',Horizontal)
+        current_path = os.getcwd()
+        file_path = os.path.join(current_path, '' if self.path is None else self.path, filename)
+        with open(file_path, "w") as f:
+            f.write("")
         container.remove()
-        message_panel = self.app.query_one("#message_panel", Static)
-        message_panel.update(f"{event.value}")
+        await tree.reload()
+        self.app.notify(f"{current_path}{'' if self.path is None else self.path }\{filename}",title="File created")
 
 class KmDirectoryTree(DirectoryTree):
+    aux_path = None
     BINDINGS = [
        ("ctrl+n", "create_file", "Create a new file"),
        ('j', "cursor_down", "Move down"),
@@ -18,24 +29,26 @@ class KmDirectoryTree(DirectoryTree):
        ('l', "select_cursor", "Select cursor"),
     ]
     def on_directory_tree_file_selected(self, event) -> None:
+        self.aux_path = event.path
         message_panel = self.app.query_one("#message_panel", Static)
-        message_panel.update(f"Selected file path: {event.path}")
+        message_panel.update(f"Selected file path: {self.aux_path}")
+
+    def on_directory_tree_directory_selected(self, event) -> None:
+        self.aux_path = event.path
+        message_panel = self.app.query_one("#message_panel", Static)
+        message_panel.update(f"Selected file path: {self.aux_path}")
 
     async def action_create_file(self) -> None:
         # Mostrar input para nombre de archivo
-         await self.prompt("Ingrese el nombre del archivo:")
+        message_panel = self.app.query_one("#message_panel", Static)
+        message_panel.update(f"Selected file path: {self.aux_path}")
+        await self.prompt("Ingrese el nombre del archivo:")
 
-            # current_path = os.getcwd()  # O la ruta seleccionada, para ejemplo se usa cwd
-            # file_path = os.path.join(current_path, filename)
-            # # Crear archivo
-            # with open(file_path, "w") as f:
-            #     f.write("")  # Archivo vacío inicialmente
-            # await self.app.message(f"Archivo '{filename}' creado en {current_path}")
 
     async def prompt(self, prompt_text: str) -> str:
         # Función para mostrar input modal para nombre de archivo
         sidebar = self.app.query_one('#sidebar',Vertical)
-        input_widget = KmInput(placeholder=prompt_text)
+        input_widget = KmInput(placeholder=prompt_text, path=self.aux_path)
         container = Horizontal(input_widget)
         container.id = "input_container"
         sidebar.mount(container)
