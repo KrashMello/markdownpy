@@ -1,16 +1,45 @@
-Static {
-    content-align: center middle;
-    background: black;
-    border: solid darkred;
-    height: 1fr;
-}
-
-.column_1 {
+.column_1{
     width: 30%;
-}
-.column {
-    width: 1fr;
-}
+  }
+
 #input_container {
     height: 5%;
+}
+.markdown_text {
+    height: 10;
+  }
+.markdown_preview {
+    width: 1fr;
+    height: 1fr;
+    padding: 1 1;
+    overflow-y: auto;
+  }
+.hidden {
+    visibility: hidden;
+  }
+
+#dialog {
+    height: 5;
+    background: $panel;
+    color: $text;
+}
+
+/* The button class */
+Button {
+    width: 1fr;
+    height: 3;
+}
+
+/* Matches the question text */
+.question {
+    text-style: bold;
+    height: 100%;
+    content-align: center middle;
+}
+
+/* Matches the button container */
+.buttons {
+    width: 100%;
+    height: auto;
+    dock: bottom;
 }
