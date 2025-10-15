@@ -1,8 +1,8 @@
 from textual.app import ComposeResult
-from textual.containers import Horizontal, Vertical, VerticalScroll
+from textual.containers import Horizontal, Vertical, VerticalScroll, Container, Grid
 from textual.widgets import Static
 from ..componets.filesTree import KmDirectoryTree
-from textual.widgets import Markdown
+from textual.widgets import Markdown, TextArea
 EXAMPLE_MARKDOWN = """\
 # Markdown Viewer
 
@@ -59,14 +59,23 @@ And when it has gone past, I will turn the inner eye to see its path.
 Where the fear has gone there will be nothing. Only I will remain.
 """
 
+TEXT = """\
+def hello(name):
+    print("hello" + name)
+
+def goodbye(name):
+    print("goodbye" + name)
+"""
+QUESTION = "Do you want to learn about Textual CSS?"
 def compose(self) -> ComposeResult:
     with Horizontal():
         with Vertical(id="sidebar", classes="column_1"):
             yield KmDirectoryTree("./", id="directory_tree")
         with Vertical():
-            with VerticalScroll():
-                markdown = Markdown(EXAMPLE_MARKDOWN)
+                markdown = Markdown(id='preview', classes="markdown_preview")
                 markdown.code_indent_guides = False
                 yield markdown
-            with Horizontal():
-                yield Static("asdf", id="message_panel")
+                text_area = TextArea(language='markdown', classes="markdown_text")
+                yield text_area
+    
+
