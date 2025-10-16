@@ -1,6 +1,6 @@
-from textual.app import ComposeResult
-from textual.widgets import DirectoryTree, Static, Input, Button
-from textual.containers import Horizontal, Vertical, Container
+from textual.widgets import DirectoryTree, Static, Input
+from textual.containers import Horizontal, Vertical
+from app.components.dialog import Dialog
 import os
 import shutil
 
@@ -21,19 +21,6 @@ class KmInput(Input):
         await tree.reload()
         self.app.notify(f"{current_path}{'' if self.path is None else self.path }\{filename}",title="File created")
 
-class Dialog(Container):
-    def __init__(self, Text: str = "Texto por defecto", **kwargs) -> None:
-        super().__init__(**kwargs)
-        self.Text = Text
-
-    def compose(self) -> ComposeResult:
-        yield Static(self.Text, classes="question")
-        yield Horizontal(
-            Button("Yes", flat=True, variant="success"),
-            Button("No", flat=True, variant="error"),
-            classes="buttons",
-        )
-
 class KmDirectoryTree(DirectoryTree):
     aux_path = None
     BINDINGS = [
@@ -45,37 +32,37 @@ class KmDirectoryTree(DirectoryTree):
     ]
     def on_directory_tree_file_selected(self, event) -> None:
         self.aux_path = event.path
-        message_panel = self.app.query_one("#message_panel", Static)
-        message_panel.update(f"Selected file path: {self.aux_path}")
 
     def on_directory_tree_directory_selected(self, event) -> None:
         self.aux_path = event.path
-        message_panel = self.app.query_one("#message_panel", Static)
-        message_panel.update(f"Selected file path: {self.aux_path}")
+
+    def handler_delete_file(self, variant):
+        if variant == 'success':
+            if self.cursor_node and self.cursor_node.data:
+                path = self.cursor_node.data.path
+                if os.path.exists(path) and str(path) != '.':
+                    try:
+                        if os.path.isfile(path):
+                            os.remove(path)
+                            self.app.notify(f"Archivo eliminado: {path}")
+                        elif os.path.isdir(path):
+                            shutil.rmtree(path)
+                            self.app.notify(f"Directorio eliminado: {path}")
+                        tree = self.app.query_one('#directory_tree', KmDirectoryTree)
+                        tree.reload()
+                    except Exception as e:
+                        self.app.notify(f"Error al eliminar: {e}")
+                else:
+                    self.app.notify("No se puede eliminar esta archivo o directorio")
+            else:
+                self.app.notify("No hay archivo o directorio seleccionado")
 
     async def action_delete_file(self) -> None:
         sidebar = self.app.query_one("#sidebar", Vertical)
-        container = Dialog(Text = 'Desea eliminar este archivo', id="dialog")
+        container = Dialog(Text = 'Desea eliminar este archivo', on_result=self.handler_delete_file, id="dialog")
         sidebar.mount(container)
         sidebar.refresh(repaint= True, layout=True)
-        if self.cursor_node and self.cursor_node.data:
-            path = self.cursor_node.data.path
-            if os.path.exists(path):
-                try:
-                    if os.path.isfile(path):
-                        # os.remove(path)
-                        self.app.notify(f"Archivo eliminado: {path}")
-                    elif os.path.isdir(path):
-                        # shutil.rmtree(path)
-                        self.app.notify(f"Directorio eliminado: {path}")
-                    tree = self.app.query_one('#directory_tree', KmDirectoryTree)
-                    await tree.reload()
-                except Exception as e:
-                    self.app.notify(f"Error al eliminar: {e}")
-            else:
-                self.app.notify("El path no existe")
-        else:
-            self.app.notify("No hay archivo o directorio seleccionado")
+        
 
     async def action_create_file(self) -> None:
         # Mostrar input para nombre de archivo
