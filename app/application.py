@@ -5,6 +5,7 @@ from textual.widgets import Markdown, TextArea
 class application(App):
 
     CSS_PATH = "./assets/css/utility_containers.tcss"
+    file_path = None
 
     def compose(self):
         yield from layouts.default.compose(self)
