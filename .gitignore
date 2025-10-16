@@ -1,8 +1,7 @@
-# Created by venv; see https://docs.python.org/3/library/venv.html
-__pycache__/**
-enviroment/**
-include/**
-Lib/**
-Scripts/**
 **/__pycache__/**
+enviroment/
+bin/
+lib/
+lib64/
 pyvenv.cfg
+test.py
