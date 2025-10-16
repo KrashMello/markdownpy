@@ -1,25 +1,18 @@
-from textual.widgets import DirectoryTree, Static, Input
+from textual.widgets import DirectoryTree, Static, Input, TextArea
 from textual.containers import Horizontal, Vertical
 from app.components.dialog import Dialog
 import os
 import shutil
 
 class KmInput(Input):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, kwargs.get('placeholder'))
-        self.path = kwargs.get('path')
+    def __init__(self, path="", on_summit=None, **kwargs):
+        super().__init__(**kwargs)
+        self.path = path
+        self.on_summit = on_summit
 
     async def on_input_submitted(self, event) -> None:
-        tree = self.app.query_one('#directory_tree', KmDirectoryTree)
-        filename = event.value
-        container = self.app.query_one('#input_container',Horizontal)
-        current_path = os.getcwd()
-        file_path = os.path.join(current_path, '' if self.path is None else self.path, filename)
-        with open(file_path, "w") as f:
-            f.write("")
-        container.remove()
-        await tree.reload()
-        self.app.notify(f"{current_path}{'' if self.path is None else self.path }\{filename}",title="File created")
+        if self.on_summit:
+            self.on_summit(event.value) 
 
 class KmDirectoryTree(DirectoryTree):
     aux_path = None
@@ -31,7 +24,14 @@ class KmDirectoryTree(DirectoryTree):
        ('l', "select_cursor", "Select cursor"),
     ]
     def on_directory_tree_file_selected(self, event) -> None:
-        self.aux_path = event.path
+        if os.path.exists(event.path):
+            try:
+                if os.path.isfile(event.path) and os.path.splitext(event.path)[1] in ['.md']:
+                    self.app.file_path = event.path
+                    editor = self.app.query_one('#editor', TextArea)
+                    editor.text = open(event.path, 'r').read()
+            except Exception as e:
+                        self.app.notify(f"archivo no valido {e}")
 
     def on_directory_tree_directory_selected(self, event) -> None:
         self.aux_path = event.path
@@ -62,19 +62,24 @@ class KmDirectoryTree(DirectoryTree):
         container = Dialog(Text = 'Desea eliminar este archivo', on_result=self.handler_delete_file, id="dialog")
         sidebar.mount(container)
         sidebar.refresh(repaint= True, layout=True)
-        
 
     async def action_create_file(self) -> None:
         # Mostrar input para nombre de archivo
-        await self.prompt("Ingrese el nombre del archivo:")
-
-
-    async def prompt(self, prompt_text: str) -> str:
-        # Función para mostrar input modal para nombre de archivo
         sidebar = self.app.query_one('#sidebar',Vertical)
-        input_widget = KmInput(placeholder=prompt_text, path=self.aux_path)
+        input_widget = KmInput(placeholder="Ingrese el nombre del archivo:", path=self.aux_path, on_summit=self.handler_create_file)
         container = Horizontal(input_widget)
         container.id = "input_container"
         sidebar.mount(container)
         sidebar.refresh(repaint= True, layout=True)
         input_widget.focus()
+
+    def handler_create_file(self, file_name: str) -> None:
+        # Función para mostrar input modal para nombre de archivo
+        container = self.app.query_one('#input_container',Horizontal)
+        container.remove()
+        current_path = os.getcwd()
+        file_path = os.path.join(current_path, '' if self.path is None else self.path, file_name)
+        with open(file_path, "w") as f:
+            f.write("")
+        self.reload()
+        self.app.notify(f"{current_path}{'' if self.path is None else self.path }\{file_name}",title="File created")
