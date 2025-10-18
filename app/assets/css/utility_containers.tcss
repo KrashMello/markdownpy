@@ -1,19 +1,20 @@
 .column_1{
     width: 30%;
   }
-
+#directory_tree{
+  background: $panel;
+}
 #input_container {
     height: 5%;
 }
-.markdown_text {
-    height: 10;
-  }
+
 .markdown_preview {
     width: 1fr;
     height: 1fr;
     overflow-y: auto;
     background: $panel;
   }
+
 .hidden {
     visibility: hidden;
     height: 0;
@@ -48,4 +49,5 @@ Button {
 .footer_bar{
     background: $panel;
     color: $text;
+    padding: 0 1;
   }
