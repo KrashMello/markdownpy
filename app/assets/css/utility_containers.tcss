@@ -11,11 +11,12 @@
 .markdown_preview {
     width: 1fr;
     height: 1fr;
-    padding: 1 1;
     overflow-y: auto;
+    background: $panel;
   }
 .hidden {
     visibility: hidden;
+    height: 0;
   }
 
 #dialog {
@@ -43,3 +44,8 @@ Button {
     height: auto;
     dock: bottom;
 }
+
+.footer_bar{
+    background: $panel;
+    color: $text;
+  }
