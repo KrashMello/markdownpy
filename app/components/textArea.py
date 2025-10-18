@@ -6,7 +6,7 @@ from app.components.filesTree import KmDirectoryTree
 class KmTextArea(TextArea):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.vim_mode = "normal"
+        self.vim_mode = "NORMAL"
         self.cursor_pos = 0
 
     BINDINGS = []
@@ -14,10 +14,10 @@ class KmTextArea(TextArea):
     async def on_key(self, event: Key) -> None:
         self.cursor_pos = self.cursor_location
         # self.app.notify(event.key)
-        if self.vim_mode == "normal":
+        if self.vim_mode == "NORMAL":
             event.prevent_default()
             if event.key == "i":
-                self.vim_mode = "insert"
+                self.vim_mode = "INSERT"
             elif event.key == "h":
                 self.action_cursor_left()
             elif event.key == "l":
@@ -33,7 +33,7 @@ class KmTextArea(TextArea):
                     self.cursor_pos[0] + 1,
                     self.cursor_pos[1] + 1,
                 ]
-                self.vim_mode = "insert"
+                self.vim_mode = "INSERT"
             elif event.key == "O":
                 self.action_cursor_line_start()
                 self.insert("\n")
@@ -41,7 +41,7 @@ class KmTextArea(TextArea):
                     self.cursor_pos[0] - 1,
                     self.cursor_pos[1],
                 ]
-                self.vim_mode = "insert"
+                self.vim_mode = "INSERT"
             elif event.key == "dollar_sign":
                 self.action_cursor_line_end()
             elif event.key == "0":
@@ -62,9 +62,9 @@ class KmTextArea(TextArea):
                 directory.focus()
             else:
                 return
-        elif self.vim_mode == "insert":
+        elif self.vim_mode == "INSERT":
             if event.key == "escape":
-                self.vim_mode = "normal"
+                self.vim_mode = "NORMAL"
             elif event.key == "ctrl+h":
                 self.action_cursor_left()
             elif event.key == "ctrl+l":
