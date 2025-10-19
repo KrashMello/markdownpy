@@ -89,10 +89,21 @@ class application(App):
     file_path = None
     BINDINGS = [
         ("ctrl+e", "editor_mode", "Editor mode"),
+        ("question_mark", "helper", "activar helper"),
     ]
 
     def compose(self):
         yield DefaultLayout(id="layout")
+
+    def action_helper(self):
+        text_area = self.query_one("#editor", KmTextArea)
+        markdown = self.query_one("#preview", Markdown)
+        text_area.add_class("hidden")
+        text_area.remove_class("markdown_preview")
+        markdown.remove_class("hidden")
+        markdown.add_class("markdown_preview")
+        text_area.text = self.HELPER
+        text_area.is_file = False
 
     async def on_text_area_changed(self, event: TextArea.Changed) -> None:
         # Actualiza el widget Markdown según lo que se escribe
