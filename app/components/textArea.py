@@ -11,7 +11,6 @@ class KmTextArea(TextArea):
 
     async def on_key(self, event: Key) -> None:
         self.cursor_pos = self.cursor_location
-        # self.app.notify(event.key)
         if self.vim_mode == "NORMAL":
             event.prevent_default()
             if event.key == "i":
