@@ -107,7 +107,7 @@ class KmDirectoryTree(DirectoryTree):
             os.makedirs(file_path)
         else:
             with open(file_path, "w") as f:
-                f.write("")
+                f.write(f"# {file_name}")
 
         self.reload()
         self.app.notify(

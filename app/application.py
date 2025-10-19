@@ -1,5 +1,6 @@
 from textual.app import App
-from textual.widgets import Markdown, TextArea
+from textual.widgets import Markdown, TextArea, Static
+from textual.containers import Vertical, VerticalScroll
 from app.layouts.default import DefaultLayout
 from app.components.textArea import KmTextArea
 
@@ -7,7 +8,7 @@ from app.components.textArea import KmTextArea
 class application(App):
     CSS = """
     .column_1{
-        width: 30%;
+        width: 25%;
     }
 #directory_tree{
     background: $panel;
@@ -19,7 +20,6 @@ class application(App):
     .markdown_preview {
         width: 1fr;
         height: 1fr;
-        overflow-y: auto;
         background: $panel;
         border: blank;
         margin: 0;
@@ -64,18 +64,37 @@ class application(App):
         padding: 0 1;
     }
         """
-    HELPER = """
-# pysidian
+    HELPER = """# pysidian
+
 ## key bindings
-- ctrl+e: editor mode
+
+- i: editor insert mode
 - ctrl+n: create file
 - ctrl+d: delete file
+- control+e: toggle hidden sidebar
 - ctrl+q: exit
+- ?: help
+
+### INSERT mode
+
+- ctrl+s: save file
 - j: cursor down
 - k: cursor up
 - l: select cursor
 - h: cursor left
 - l: cursor right
+
+### NORMAL mode
+- ctrl+j: cursor down
+- ctrl+k: cursor up
+- ctrl+l: select cursor
+- ctrl+h: cursor left
+- ctrl+l: cursor right
+- ctrl+s: save file
+- ctrl+v: paste line
+- ctrl+x: cut line
+- K: scroll up
+- J: scroll down
 - o: cursor line end
 - O: cursor line start
 - $: cursor line end
@@ -83,21 +102,41 @@ class application(App):
 - u: undo
 - r: redo
 - x: delete right
-- w: write file
-- ?: help
+- w: save file
         """
     file_path = None
+    vim_mode = "NORMAL"
+    hidden = False
     BINDINGS = [
-        ("ctrl+e", "editor_mode", "Editor mode"),
+        ("i", "editor_mode", "Editor mode"),
         ("question_mark", "helper", "activar helper"),
+        ("ctrl+e", "hidden_sidebar", "Toggle hidden sidebar"),
+        ("K", "preview_scroll_up", "Preview scroll up"),
+        ("J", "preview_scroll_down", "Preview scroll down"),
     ]
 
     def compose(self):
         yield DefaultLayout(id="layout")
 
+    def action_preview_scroll_up(self):
+        markdown = self.query_one("#markdown_container", VerticalScroll)
+        markdown.scroll_up()
+
+    def action_preview_scroll_down(self):
+        markdown = self.query_one("#markdown_container", VerticalScroll)
+        markdown.scroll_down()
+
+    def action_hidden_sidebar(self):
+        if self.hidden:
+            self.hidden = False
+            self.app.query_one("#sidebar", Vertical).remove_class("hidden")
+        else:
+            self.hidden = True
+            self.app.query_one("#sidebar", Vertical).add_class("hidden")
+
     def action_helper(self):
         text_area = self.query_one("#editor", KmTextArea)
-        markdown = self.query_one("#preview", Markdown)
+        markdown = self.query_one("#markdown_container", VerticalScroll)
         text_area.add_class("hidden")
         text_area.remove_class("markdown_preview")
         markdown.remove_class("hidden")
@@ -112,9 +151,13 @@ class application(App):
 
     def action_editor_mode(self):
         text_area = self.query_one("#editor", KmTextArea)
-        markdown = self.query_one("#preview", Markdown)
-        markdown.add_class("hidden")
-        markdown.remove_class("markdown_preview")
-        text_area.remove_class("hidden")
-        text_area.add_class("markdown_preview")
-        text_area.focus()
+        markdown = self.query_one("#markdown_container", VerticalScroll)
+        if self.vim_mode == "NORMAL":
+            self.vim_mode = "INSERT"
+            footer = self.app.query_one("#footer", Static)
+            footer.content = self.vim_mode
+            markdown.add_class("hidden")
+            markdown.remove_class("markdown_preview")
+            text_area.remove_class("hidden")
+            text_area.add_class("markdown_preview")
+            text_area.focus()

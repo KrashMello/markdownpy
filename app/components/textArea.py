@@ -1,20 +1,24 @@
 from textual.widgets import TextArea, Static, Markdown
 from textual.events import Key
+from textual.containers import VerticalScroll
 from app.components.filesTree import KmDirectoryTree
 
 
 class KmTextArea(TextArea):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.vim_mode = "NORMAL"
         self.is_file = False
+
+    BINDINGS = [
+        ("ctrl+k", "nothing", "nothing"),
+    ]
 
     async def on_key(self, event: Key) -> None:
         self.cursor_pos = self.cursor_location
-        if self.vim_mode == "NORMAL":
+        if self.app.vim_mode == "NORMAL":
             event.prevent_default()
             if event.key == "i":
-                self.vim_mode = "INSERT"
+                self.app.vim_mode = "INSERT"
             elif event.key == "h":
                 self.action_cursor_left()
             elif event.key == "l":
@@ -30,7 +34,7 @@ class KmTextArea(TextArea):
                     self.cursor_pos[0] + 1,
                     self.cursor_pos[1] + 1,
                 ]
-                self.vim_mode = "INSERT"
+                self.app.vim_mode = "INSERT"
             elif event.key == "O":
                 self.action_cursor_line_start()
                 self.insert("\n")
@@ -38,7 +42,7 @@ class KmTextArea(TextArea):
                     self.cursor_pos[0] - 1,
                     self.cursor_pos[1],
                 ]
-                self.vim_mode = "INSERT"
+                self.app.vim_mode = "INSERT"
             elif event.key == "dollar_sign":
                 self.action_cursor_line_end()
             elif event.key == "0":
@@ -51,17 +55,27 @@ class KmTextArea(TextArea):
                 self.action_delete_right()
             elif event.key == "w":
                 directory = self.app.query_one("#directory_tree", KmDirectoryTree)
-                markdown = self.app.query_one("#preview", Markdown)
+                markdown = self.app.query_one("#markdown_container", VerticalScroll)
                 self.add_class("hidden")
                 self.remove_class("markdown_preview")
                 markdown.remove_class("hidden")
                 markdown.add_class("markdown_preview")
                 directory.focus()
+                self.app.vim_mode = "NORMAL"
+            elif event.key == "ctrl+s":
+                directory = self.app.query_one("#directory_tree", KmDirectoryTree)
+                markdown = self.app.query_one("#mark", VerticalScroll)
+                self.add_class("hidden")
+                self.remove_class("markdown_preview")
+                markdown.remove_class("hidden")
+                markdown.add_class("markdown_preview")
+                directory.focus()
+                self.app.vim_mode = "NORMAL"
             else:
                 return
-        elif self.vim_mode == "INSERT":
+        elif self.app.vim_mode == "INSERT":
             if event.key == "escape":
-                self.vim_mode = "NORMAL"
+                self.app.vim_mode = "NORMAL"
             elif event.key == "ctrl+h":
                 self.action_cursor_left()
             elif event.key == "ctrl+l":
@@ -69,13 +83,24 @@ class KmTextArea(TextArea):
             elif event.key == "ctrl+j":
                 self.action_cursor_down()
             elif event.key == "ctrl+k":
-                event.prevent_default()
                 self.action_cursor_up()
+            elif event.key == "ctrl+s":
+                directory = self.app.query_one("#directory_tree", KmDirectoryTree)
+                markdown = self.app.query_one("#markdown_container", VerticalScroll)
+                self.add_class("hidden")
+                self.remove_class("markdown_preview")
+                markdown.remove_class("hidden")
+                markdown.add_class("markdown_preview")
+                directory.focus()
+                self.app.vim_mode = "NORMAL"
             else:
                 return event.key
 
         footer = self.app.query_one("#footer", Static)
-        footer.content = self.vim_mode
+        footer.content = self.app.vim_mode
+
+    def action_nothing(self) -> None:
+        return
 
     def on_text_area_changed(self, event: TextArea.Changed) -> None:
         if self.is_file:

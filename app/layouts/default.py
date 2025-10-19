@@ -12,10 +12,13 @@ class DefaultLayout(Horizontal):
         with Vertical(id="sidebar", classes="column_1"):
             yield KmDirectoryTree("./", id="directory_tree")
         with Vertical():
-            markdown = Markdown(id="preview", classes="markdown_preview")
-            markdown.code_indent_guides = False
-            yield markdown
+            with VerticalScroll(
+                id="markdown_container", can_focus=True, classes="markdown_preview"
+            ):
+                markdown = Markdown(id="preview")
+                markdown.code_indent_guides = False
+                yield markdown
             text_area = KmTextArea(language="markdown", classes="hidden", id="editor")
             text_area.text = self.app.HELPER
             yield text_area
-            yield Static(text_area.vim_mode, classes="footer_bar", id="footer")
+            yield Static(self.app.vim_mode, classes="footer_bar", id="footer")
