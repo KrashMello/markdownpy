@@ -70,6 +70,7 @@ class application(App):
 - ctrl+e: editor mode
 - ctrl+n: create file
 - ctrl+d: delete file
+- ctrl+q: exit
 - j: cursor down
 - k: cursor up
 - l: select cursor
