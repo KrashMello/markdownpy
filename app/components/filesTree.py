@@ -26,6 +26,7 @@ class KmDirectoryTree(DirectoryTree):
                     self.app.file_path = event.path
                     editor = self.app.query_one("#editor", TextArea)
                     editor.text = open(event.path, "r").read()
+                    editor.is_file = True
                     editor.focus()
             except Exception as e:
                 self.app.notify(f"archivo no valido {e}")
