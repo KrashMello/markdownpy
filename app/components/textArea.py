@@ -7,9 +7,7 @@ class KmTextArea(TextArea):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.vim_mode = "NORMAL"
-        self.cursor_pos = 0
-
-    BINDINGS = []
+        self.is_file = False
 
     async def on_key(self, event: Key) -> None:
         self.cursor_pos = self.cursor_location
@@ -81,7 +79,8 @@ class KmTextArea(TextArea):
         footer.content = self.vim_mode
 
     def on_text_area_changed(self, event: TextArea.Changed) -> None:
-        # Actualiza el widget Markdown según lo que se escribe
-        file_path = self.app.file_path
-        file = open(file_path, "w")
-        file.write(event.text_area.text)
+        if self.is_file:
+            # Actualiza el widget Markdown según lo que se escribe
+            file_path = self.app.file_path
+            file = open(file_path, "w")
+            file.write(event.text_area.text)

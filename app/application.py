@@ -1,7 +1,7 @@
 from textual.app import App
-from . import layouts
 from textual.widgets import Markdown, TextArea
 from app.layouts.default import DefaultLayout
+from app.components.textArea import KmTextArea
 
 
 class application(App):
@@ -21,11 +21,15 @@ class application(App):
         height: 1fr;
         overflow-y: auto;
         background: $panel;
+        border: blank;
+        margin: 0;
+        scrollbar-size: 1 1;
+        padding: 0;
     }
 
     .hidden {
+        display: none;
         visibility: hidden;
-        height: 0;
     }
 
 #dialog {
@@ -60,8 +64,31 @@ class application(App):
         padding: 0 1;
     }
         """
-
+    HELPER = """
+# pysidian
+## key bindings
+- ctrl+e: editor mode
+- ctrl+n: create file
+- ctrl+d: delete file
+- j: cursor down
+- k: cursor up
+- l: select cursor
+- h: cursor left
+- l: cursor right
+- o: cursor line end
+- O: cursor line start
+- $: cursor line end
+- 0: cursor line start
+- u: undo
+- r: redo
+- x: delete right
+- w: write file
+- ?: help
+        """
     file_path = None
+    BINDINGS = [
+        ("ctrl+e", "editor_mode", "Editor mode"),
+    ]
 
     def compose(self):
         yield DefaultLayout(id="layout")
@@ -70,3 +97,12 @@ class application(App):
         # Actualiza el widget Markdown según lo que se escribe
         preview = self.query_one("#preview", Markdown)
         preview.update(f"{event.text_area.text}")
+
+    def action_editor_mode(self):
+        text_area = self.query_one("#editor", KmTextArea)
+        markdown = self.query_one("#preview", Markdown)
+        markdown.add_class("hidden")
+        markdown.remove_class("markdown_preview")
+        text_area.remove_class("hidden")
+        text_area.add_class("markdown_preview")
+        text_area.focus()
