@@ -3,13 +3,13 @@
 
 ## Descripción
 
-pysidian es un proyecto desarrollado en Python. Aunque no se proporciona una descripción específica ni funcionalidades detalladas, este repositorio contiene código Python que puede servir como base para futuros desarrollos o experimentos en este lenguaje.
+pysidian es una interfaz de usuario textual (TUI) para la terminal que permite editar y visualizar archivos Markdown de manera eficiente. Inspirado en la experiencia de usuario de Obsidian, ofrece funcionalidades para gestionar notas y documentos Markdown desde la línea de comandos, integrando visualización y edición en un entorno amigable para usuarios que prefieren trabajar en terminal. Esta herramienta facilita un flujo de trabajo ágil para quienes desean un manejo rápido y concentrado de sus archivos Markdown sin salir del entorno de la terminal.
 
 ## Funcionalidades
 
 - Código completamente en Python.
 - Proyecto en versión inicial (0.0.1).
-- Ideal para aprendizaje o base para proyectos relacionados con Python.
+- edicion y previsualizacion de archivos markdown
 
 ## Instalación
 
@@ -25,11 +25,45 @@ git clone https://github.com/KrashMello/pysidian.git
 cd pysidian
 ```
 
-3. Instalar las dependencias necesarias (si existen) o ejecutar directamente los scripts Python.
+3. Crear un entorno virtual (recomendado para aislar dependencias):
+
+Linux/Mac:
+
+```bash
+python3 -m venv venv
+```
+
+Windows:
+
+```bash
+python -m venv venv
+```
+
+4. Activar el entorno virtual:
+
+Linux/Mac:
+
+```bash
+source venv/bin/activate
+```
+
+Windows
+
+```bash
+venv\Scripts\activate
+```
+
+5. Instalar las dependencias desde el archivo requirements.txt:
+
+```bash
+pip install -r requirements.txt
+```
 
 ## Uso
 
-Como el repositorio no especifica scripts principales ni ejemplos de uso, se recomienda explorar el contenido del código para entender su funcionamiento y adaptarlo según necesidades.
+```bash
+python3 pysidian.py
+```
 
 ## Estado del Proyecto
 
