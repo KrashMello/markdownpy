@@ -1,6 +1,10 @@
 
 # pysidian
 
+![imagen 1](./assets/1.png)
+![imagen 2](./assets/2.png)
+![imagen 3](./assets/3.png)
+
 ## Descripción
 
 pysidian es una interfaz de usuario textual (TUI) para la terminal que permite editar y visualizar archivos Markdown de manera eficiente. Inspirado en la experiencia de usuario de Obsidian, ofrece funcionalidades para gestionar notas y documentos Markdown desde la línea de comandos, integrando visualización y edición en un entorno amigable para usuarios que prefieren trabajar en terminal. Esta herramienta facilita un flujo de trabajo ágil para quienes desean un manejo rápido y concentrado de sus archivos Markdown sin salir del entorno de la terminal.
